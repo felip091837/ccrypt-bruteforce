@@ -1,20 +1,18 @@
 #!/bin/bash
 
-#felipesi - 2017
-
 if [ $# != '2' ]; then
-	echo USAGE: $0 file.cpt wordlist.txt
+    echo USAGE: $0 file.cpt wordlist.txt
 else
+    file=$(echo $1 | sed 's/.cpt//')
 
-file=$(echo $1 | sed 's/.cpt//')
-
-for i in $(cat $2); do
-	ccrypt -d -K $i $1 &> /dev/null
-	if [ -e $file ]; then
-		echo SUCCESS - $i
-		break
-	else
-		echo FAILED - $i
-	fi
-done
+    while IFS="" read -r i || [ -n "$i" ]
+    do
+        ccrypt -c -K "$i" "$1" 2> /dev/null
+        if [ $? -eq 0 ]; then
+            echo SUCCESS - $i
+            break
+        else
+            echo FAILED - $i
+        fi
+    done < "$2"
 fi
